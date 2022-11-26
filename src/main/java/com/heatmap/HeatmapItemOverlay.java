@@ -94,6 +94,21 @@ public class HeatmapItemOverlay extends WidgetItemOverlay
 		return new Color(c.getRed(), c.getGreen(), c.getBlue(), ALPHA);
 	}
 
+	private static Color getColorQuintile(float value)
+	{
+		double quintile = 0.0;
+		if(value > 0.80){quintile = 0.90;}
+		else if(value > 0.60){quintile = 0.70;}
+		else if(value > 0.40){quintile = 0.50;}
+		else if(value > 0.20){quintile = 0.30;}
+		else{quintile = 0.10;}
+
+		float h = (float) ((1-quintile)*COLOR_BOUNDARY / 360);
+		Color c = Color.getHSBColor(h, 1, 1f);
+
+		return new Color(c.getRed(), c.getGreen(), c.getBlue(), ALPHA);
+	}
+
 	private BufferedImage getImage(HeatmapItem item, HEATMAP_MODE mode)
 	{
 		ItemComposition itemComposition = itemManager.getItemComposition(item.getId());

@@ -34,6 +34,12 @@ public class HeatmapPlugin extends Plugin
 		GE
 	}
 
+	enum GROUP_MODE
+	{
+		NORMAL,
+		QUINTILE
+	}
+
 	private static final List<Integer> TAB_VARBITS = ImmutableList.of(
 		Varbits.BANK_TAB_ONE_COUNT,
 		Varbits.BANK_TAB_TWO_COUNT,
@@ -67,6 +73,9 @@ public class HeatmapPlugin extends Plugin
 	@Getter
 	private HEATMAP_MODE heatmapMode = HEATMAP_MODE.NULL;
 
+	@Getter
+	private GROUP_MODE groupMode = GROUP_MODE.NORMAL;
+
 	@Override
 	protected void startUp()
 	{
@@ -80,6 +89,7 @@ public class HeatmapPlugin extends Plugin
 		overlayManager.remove(heatmapItemOverlay);
 		overlayManager.remove(heatmapTutorialOverlay);
 		heatmapMode = HEATMAP_MODE.NULL;
+		groupMode = GROUP_MODE.NORMAL;
 	}
 
 	@Provides
@@ -103,6 +113,15 @@ public class HeatmapPlugin extends Plugin
 		else
 		{
 			overlayManager.remove(heatmapTutorialOverlay);
+		}
+
+		if (config.groupQuintile())
+		{
+			groupMode = GROUP_MODE.QUINTILE;
+		}
+		else
+		{
+			groupMode = GROUP_MODE.NORMAL;
 		}
 	}
 

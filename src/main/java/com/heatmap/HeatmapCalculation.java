@@ -111,6 +111,7 @@ public class HeatmapCalculation
 		}
 	}
 
+
 	private static float normalize(int a, int b, long min, long max, long x)
 	{
 		return (b - a) * ((float) (x - min) / (max - min)) + a;
