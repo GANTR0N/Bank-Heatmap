@@ -27,6 +27,8 @@ package com.heatmap;
 
 import lombok.Data;
 
+import java.util.Comparator;
+
 @Data
 class HeatmapItem
 {
@@ -39,4 +41,24 @@ class HeatmapItem
 	private float geFactor;
 
 	private int quantity;
+
+	private int gePosition;
+	private float geRelative;
+
+	private int alchPosition;
+	private float alchRelative;
+}
+
+class geSorter implements Comparator<HeatmapItem> {
+	@Override
+	public int compare(HeatmapItem o1, HeatmapItem o2) {
+		return (int) ((o1.getGeFactor()*10000) - (o2.getGeFactor()*10000));
+	}
+}
+
+class alchSorter implements Comparator<HeatmapItem> {
+	@Override
+	public int compare(HeatmapItem o1, HeatmapItem o2) {
+		return (int) ((o1.getAlchFactor()*10000) - (o2.getAlchFactor()*10000));
+	}
 }

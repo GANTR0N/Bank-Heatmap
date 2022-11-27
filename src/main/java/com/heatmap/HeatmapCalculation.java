@@ -32,6 +32,7 @@ import net.runelite.api.ItemID;
 import net.runelite.client.game.ItemManager;
 
 import javax.inject.Inject;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,7 +52,6 @@ public class HeatmapCalculation
 	void calculate(Item[] items)
 	{
 		heatmapItems.clear();
-
 		for (final Item item : items)
 		{
 			final int qty = item.getQuantity();
@@ -109,11 +109,56 @@ public class HeatmapCalculation
 			hItem.setAlchFactor(normalize(0, 1, minAlch, maxAlch, hItem.getAlchPrice()));
 			hItem.setGeFactor(normalize(0, 1, minGe, maxGe, hItem.getGePrice()));
 		}
+		findPosition(heatmapItems);
 	}
 
 
 	private static float normalize(int a, int b, long min, long max, long x)
 	{
 		return (b - a) * ((float) (x - min) / (max - min)) + a;
+	}
+
+	private void findPosition(Map<Integer, HeatmapItem> heatmapItems)
+	{
+		int n = heatmapItems.size();
+		HeatmapItem[] geTemp = new HeatmapItem[n];
+		HeatmapItem[] alchSort = new HeatmapItem[n];
+
+		int count = 0;
+		int geCount = 0;
+		for (HeatmapItem hItem : heatmapItems.values())
+		{
+			if(hItem.getGePrice() > 0)
+			{
+				geTemp[geCount] = hItem;
+				geCount++;
+			}
+			alchSort[count] = hItem;
+			count++;
+		}
+
+		HeatmapItem[] geSort = new HeatmapItem[geCount];
+		for(int i = 0; i<geCount;i++)
+		{
+			geSort[i] = geTemp[i];
+		}
+
+		Arrays.sort(geSort, new geSorter());
+		Arrays.sort(alchSort, new alchSorter());
+
+		for(int i =0; i<geCount;i++)
+		{
+			geSort[i].setGePosition(i);
+			geSort[i].setGeRelative(i/geCount);
+
+			alchSort[i].setAlchPosition(i);
+			alchSort[i].setAlchRelative(i/n);
+		}
+
+		for(int i = geCount; i < n; i++)
+		{
+			alchSort[i].setAlchPosition(i);
+			alchSort[i].setAlchRelative(i/n);
+		}
 	}
 }

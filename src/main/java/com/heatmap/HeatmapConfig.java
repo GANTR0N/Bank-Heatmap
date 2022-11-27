@@ -19,12 +19,12 @@ public interface HeatmapConfig extends Config
 	}
 
 	@ConfigItem(
-			keyName = "Quintile",
-			name = "Group By Quintile",
-			description = "Groups item cost by quintile, so that outliers don't skew the display",
+			keyName = "Relative",
+			name = "Relative Grouping",
+			description = "Groups item prices by percentile, rather than proportion.",
 			position = 2
 	)
-	default boolean groupQuintile() { return false; }
+	default boolean groupRelative() { return false; }
 	@ConfigItem(
 		keyName = "tutorial",
 		name = "",

@@ -29,6 +29,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.inject.Inject;
 import com.heatmap.HeatmapPlugin.HEATMAP_MODE;
+import com.heatmap.HeatmapPlugin.GROUP_MODE;
 import lombok.Getter;
 import net.runelite.api.ItemComposition;
 import net.runelite.api.widgets.WidgetInfo;
@@ -68,6 +69,7 @@ public class HeatmapItemOverlay extends WidgetItemOverlay
 	{
 		HeatmapItem hItem = plugin.getHeatmapItem(itemId);
 		HEATMAP_MODE mode = plugin.getHeatmapMode();
+		GROUP_MODE grouping = plugin.getGroupMode();
 		if (hItem == null || itemWidget.getWidget().getParentId() != WidgetInfo.BANK_ITEM_CONTAINER.getId()
 			|| mode == HEATMAP_MODE.NULL
 			|| (mode == HEATMAP_MODE.GE && hItem.getGePrice() < 1) || (mode == HEATMAP_MODE.HA && hItem.getAlchPrice() < 1))
@@ -79,7 +81,7 @@ public class HeatmapItemOverlay extends WidgetItemOverlay
 		BufferedImage image = heatmapImages.getIfPresent(itemId);
 		if (image == null)
 		{
-			image = getImage(hItem, mode);
+			image = getImage(hItem, mode, grouping);
 			heatmapImages.put(itemId, image);
 		}
 
@@ -94,27 +96,30 @@ public class HeatmapItemOverlay extends WidgetItemOverlay
 		return new Color(c.getRed(), c.getGreen(), c.getBlue(), ALPHA);
 	}
 
-	private static Color getColorQuintile(float value)
+	private static Color getColorRelative(float value)
 	{
-		double quintile = 0.0;
-		if(value > 0.80){quintile = 0.90;}
-		else if(value > 0.60){quintile = 0.70;}
-		else if(value > 0.40){quintile = 0.50;}
-		else if(value > 0.20){quintile = 0.30;}
-		else{quintile = 0.10;}
-
-		float h = (float) ((1-quintile)*COLOR_BOUNDARY / 360);
+		float h =  (1-value)*COLOR_BOUNDARY / 360;
 		Color c = Color.getHSBColor(h, 1, 1f);
 
 		return new Color(c.getRed(), c.getGreen(), c.getBlue(), ALPHA);
 	}
 
-	private BufferedImage getImage(HeatmapItem item, HEATMAP_MODE mode)
+	private BufferedImage getImage(HeatmapItem item, HEATMAP_MODE mode, GROUP_MODE grouping)
 	{
+		Color color = new Color(0);
+
 		ItemComposition itemComposition = itemManager.getItemComposition(item.getId());
 		boolean stackable = item.getQuantity() > 1 || itemComposition.isStackable();
 		BufferedImage image = itemManager.getImage(item.getId(), item.getQuantity(), stackable);
-		Color color = getColor(mode == HEATMAP_MODE.GE ? item.getGeFactor() : item.getAlchFactor());
+		if(grouping == GROUP_MODE.RELATIVE)
+		{
+			color = getColorRelative(mode == HEATMAP_MODE.GE ? item.getGeRelative() : item.getAlchRelative());
+		}
+		else
+		{
+			color = getColor(mode == HEATMAP_MODE.GE ? item.getGeFactor() : item.getAlchFactor());
+		}
+
 		return ImageUtil.fillImage(image, color);
 	}
 }

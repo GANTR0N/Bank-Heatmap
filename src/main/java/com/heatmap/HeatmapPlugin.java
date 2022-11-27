@@ -37,7 +37,8 @@ public class HeatmapPlugin extends Plugin
 	enum GROUP_MODE
 	{
 		NORMAL,
-		QUINTILE
+		QUINTILE,
+		RELATIVE
 	}
 
 	private static final List<Integer> TAB_VARBITS = ImmutableList.of(
@@ -98,6 +99,7 @@ public class HeatmapPlugin extends Plugin
 		return configManager.getConfig(HeatmapConfig.class);
 	}
 
+
 	@Subscribe
 	public void onConfigChanged(ConfigChanged event)
 	{
@@ -115,13 +117,19 @@ public class HeatmapPlugin extends Plugin
 			overlayManager.remove(heatmapTutorialOverlay);
 		}
 
-		if (config.groupQuintile())
+		if (config.groupRelative())
 		{
-			groupMode = GROUP_MODE.QUINTILE;
+			groupMode = GROUP_MODE.RELATIVE;
+			Item[] items = getBankTabItems();
+			heatmapItemOverlay.getHeatmapImages().invalidateAll();
+			heatmapCalculation.calculate(items);
 		}
 		else
 		{
 			groupMode = GROUP_MODE.NORMAL;
+			Item[] items = getBankTabItems();
+			heatmapItemOverlay.getHeatmapImages().invalidateAll();
+			heatmapCalculation.calculate(items);
 		}
 	}
 
